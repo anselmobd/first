@@ -1,5 +1,5 @@
-from fastapi import FastAPI
-from model import User
+from fastapi import FastAPI, HTTPException
+from model import User, UserData
 from database import Users
 
 
@@ -13,7 +13,15 @@ def index():
 
 
 @app.post('/users')
-def createUser(user: User):
+def create_user(user: User):
     users.add_user(user)
     users.pprint() 
     return {'user': user}
+
+
+@app.put("/users/{id}")
+def update_user(id: int, user: UserData):
+    if (user := users.update_user(id, user)):
+        users.pprint() 
+        return user 
+    raise HTTPException(status_code=404, detail="User not found.")
